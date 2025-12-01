@@ -8,7 +8,7 @@ use nom::combinator::{all_consuming, map_res, opt, recognize};
 use nom::error::ParseError;
 use nom::multi::separated_list1;
 use nom::sequence::{pair, terminated};
-use nom::{IResult, OutputMode, PResult, Parser};
+use nom::{IResult, Parser};
 
 pub fn parse_input_by_lines<'a, O, E, F>(f: F) -> impl Parser<&'a str, Output = Vec<O>, Error = E>
 where
