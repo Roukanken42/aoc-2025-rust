@@ -8,26 +8,26 @@ use nom::combinator::{all_consuming, map_res, opt, recognize};
 use nom::error::ParseError;
 use nom::multi::separated_list1;
 use nom::sequence::{pair, terminated};
-use nom::{IResult, Parser};
+use nom::{IResult, OutputMode, PResult, Parser};
 
-pub fn parse_input_by_lines<'a, O, E, F>(f: F) -> impl FnMut(&'a str) -> IResult<&'a str, Vec<O>, E>
+pub fn parse_input_by_lines<'a, O, E, F>(f: F) -> impl Parser<&'a str, Output = Vec<O>, Error = E>
 where
-    F: Parser<&'a str, O, E>,
+    F: Parser<&'a str, Output = O, Error = E>,
     E: ParseError<&'a str>,
 {
     parse_input(separated_list1(line_ending, f))
 }
 
-pub fn parse_input<'a, O, E, F>(f: F) -> impl FnMut(&'a str) -> IResult<&'a str, O, E>
+pub fn parse_input<'a, O, E, F>(f: F) -> impl Parser<&'a str, Output = O, Error = E>
 where
-    F: Parser<&'a str, O, E>,
+    F: Parser<&'a str, Output = O, Error = E>,
     E: ParseError<&'a str>,
 {
     all_consuming(terminated(f, opt(line_ending)))
 }
 
 pub fn end_of_file(input: &str) -> IResult<&str, ()> {
-    let (input, _) = all_consuming(opt(line_ending))(input)?;
+    let (input, _) = all_consuming(opt(line_ending)).parse(input)?;
     Ok((input, ()))
 }
 
@@ -42,7 +42,7 @@ macro_rules! impl_parsable_uint {
         $(
             impl<'a> Parsable<'a> for $t {
                 fn parse(input: &str) -> IResult<&str, Self> {
-                    map_res(digit1, Self::from_str)(input)
+                    map_res(digit1, Self::from_str).parse(input)
                 }
             }
         )+
@@ -56,7 +56,7 @@ macro_rules! impl_parsable_int {
         $(
             impl<'a> Parsable<'a> for $t {
                 fn parse(input: &str) -> IResult<&str, Self> {
-                    map_res(recognize(pair(opt(is_a("-")), digit1)), Self::from_str)(input)
+                    map_res(recognize(pair(opt(is_a("-")), digit1)), Self::from_str).parse(input)
                 }
             }
         )+
@@ -67,6 +67,6 @@ impl_parsable_int!(for i8, i16, i32, i64, i128, isize);
 
 impl<'a, T: Parsable<'a>> Parsable<'a> for Vec<T> {
     fn parse(input: &'a str) -> IResult<&'a str, Self> {
-        separated_list1(space1, T::parse)(input)
+        separated_list1(space1, T::parse).parse(input)
     }
 }
