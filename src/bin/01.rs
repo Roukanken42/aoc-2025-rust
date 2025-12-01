@@ -49,7 +49,26 @@ pub fn part_one(input: &str) -> Option<usize> {
 }
 
 pub fn part_two(input: &str) -> Option<i32> {
-    None
+    let (_, rotations) = parse_input(input).unwrap();
+
+    let result = rotations
+        .into_iter()
+        .scan(50i32, |acc, rot| {
+            let nextacc = match rot {
+                Rotation::Left(deg) => *acc - (deg as i32),
+                Rotation::Right(deg) => *acc + (deg as i32),
+            };
+
+            // This is definitely wrong
+            let clicks = (acc.div_euclid(100) - nextacc.div_euclid(100)).abs();
+            *acc = nextacc;
+
+            Some(clicks)
+        })
+        .inspect(|x| println!("{:?}", x))
+        .sum();
+
+    Some(result)
 }
 
 #[cfg(test)]
@@ -91,6 +110,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(6));
     }
 }
