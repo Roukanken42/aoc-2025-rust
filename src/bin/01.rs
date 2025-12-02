@@ -24,12 +24,12 @@ impl Parsable<'_> for Rotation {
     }
 }
 
-fn parse_input(input: &str) -> IResult<&str, Vec<Rotation>> {
+fn parse(input: &str) -> IResult<&str, Vec<Rotation>> {
     parse_input_by_lines(Rotation::parse).parse(input)
 }
 
 pub fn part_one(input: &str) -> Option<usize> {
-    let (_, rotations) = parse_input(input).unwrap();
+    let (_, rotations) = parse(input).unwrap();
 
     let result = rotations
         .into_iter()
@@ -49,7 +49,7 @@ pub fn part_one(input: &str) -> Option<usize> {
 }
 
 pub fn part_two(input: &str) -> Option<i32> {
-    let (_, rotations) = parse_input(input).unwrap();
+    let (_, rotations) = parse(input).unwrap();
 
     let result = rotations
         .into_iter()
@@ -79,7 +79,7 @@ mod tests {
     #[test]
     fn test_parse() {
         let input = advent_of_code::template::read_file("examples", DAY);
-        let result = parse_input(&input);
+        let result = parse(&input);
 
         assert_eq!(
             result,
