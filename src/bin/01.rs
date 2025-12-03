@@ -65,7 +65,6 @@ pub fn part_two(input: &str) -> Option<i32> {
 
             Some(clicks)
         })
-        .inspect(|x| println!("{:?}", x))
         .sum();
 
     Some(result)
