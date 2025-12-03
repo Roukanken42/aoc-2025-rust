@@ -3,6 +3,7 @@ use nom::IResult;
 use nom::Parser;
 use nom::character::complete::one_of;
 use nom::multi::many1;
+use std::cmp::min;
 
 advent_of_code::solution!(3);
 
@@ -27,6 +28,29 @@ fn highest_joltage(input: &[u64]) -> u64 {
     l * 10 + r
 }
 
+fn highest_joltage_with_digits(input: &[u64], digits: usize) -> u64 {
+    let mut joltage = vec![None; digits];
+
+    for (index, &x) in input.iter().enumerate() {
+        let first_influence = digits - min(input.len() - index, digits);
+
+        for i in first_influence..digits {
+            if joltage[i].unwrap_or(0) < x {
+                joltage[i] = Some(x);
+                for j in i + 1..digits {
+                    joltage[j] = None;
+                }
+
+                break;
+            }
+        }
+    }
+
+    joltage
+        .into_iter()
+        .fold(0, |acc, x| acc * 10 + x.unwrap_or(0))
+}
+
 pub fn part_one(input: &str) -> Option<u64> {
     let (_, inputs) = parse(input).unwrap();
 
@@ -34,7 +58,14 @@ pub fn part_one(input: &str) -> Option<u64> {
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
-    None
+    let (_, inputs) = parse(input).unwrap();
+
+    Some(
+        inputs
+            .iter()
+            .map(|input| highest_joltage_with_digits(input, 12))
+            .sum(),
+    )
 }
 
 #[cfg(test)]
@@ -67,6 +98,15 @@ mod tests {
 
         let input = vec![1, 2, 3];
         assert_eq!(highest_joltage(&input), 23);
+    }
+
+    #[test]
+    fn test_highest_joltage_with_digits() {
+        let input = vec![8, 1, 8, 1, 8, 1, 9, 1, 1, 1, 1, 2, 1, 1, 1];
+        assert_eq!(highest_joltage_with_digits(&input, 12), 888911112111);
+
+        let input = vec![2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 7, 8];
+        assert_eq!(highest_joltage_with_digits(&input, 12), 434234234278);
     }
 
     #[test]
