@@ -1,14 +1,13 @@
 use advent_of_code::utils::parse_input_by_lines;
 use nom::IResult;
 use nom::Parser;
-use nom::bytes::complete::take_while;
-use std::cmp::min;
+use nom::bytes::complete::take_while1;
 
 advent_of_code::solution!(3);
 
 pub fn parse_line(input: &str) -> IResult<&str, Vec<u64>> {
-    let (input, line) = take_while(|c: char| c.is_numeric()).parse(input)?;
-    let result = line.chars().map(|c| c as u64 - '0' as u64).collect();
+    let (input, line) = take_while1(|c: char| c.is_numeric()).parse(input)?;
+    let result: Vec<u64> = line.chars().map(|c| c as u64 - '0' as u64).collect();
 
     Ok((input, result))
 }
@@ -31,26 +30,21 @@ fn highest_joltage(input: &[u64]) -> u64 {
 }
 
 fn highest_joltage_with_digits(input: &[u64], digits: usize) -> u64 {
-    let mut joltage = vec![None; digits];
+    let mut joltage = vec![];
 
     for (index, &x) in input.iter().enumerate() {
-        let first_influence = digits - min(input.len() - index, digits);
+        let left = input.len() - index;
 
-        for i in first_influence..digits {
-            if joltage[i].unwrap_or(0) < x {
-                joltage[i] = Some(x);
-                for j in i + 1..digits {
-                    joltage[j] = None;
-                }
+        while left >= digits - joltage.len() + 1 && *joltage.last().unwrap_or(&999u64) < x {
+            joltage.pop();
+        }
 
-                break;
-            }
+        if joltage.len() < digits {
+            joltage.push(x)
         }
     }
 
-    joltage
-        .into_iter()
-        .fold(0, |acc, x| acc * 10 + x.unwrap_or(0))
+    joltage.into_iter().fold(0, |acc, x| acc * 10 + x)
 }
 
 pub fn part_one(input: &str) -> Option<u64> {
@@ -120,6 +114,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(3121910778619));
     }
 }
