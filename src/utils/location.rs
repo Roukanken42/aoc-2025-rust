@@ -1,10 +1,10 @@
 use std::cmp::Ordering;
 use std::fmt::{Display, Formatter};
-use std::iter::{successors, Sum};
+use std::iter::{Sum, successors};
 use std::ops::{Add, Div, Mul, Neg, RangeInclusive, Rem, Sub};
 
 use num::traits::Euclid;
-use num::{one, zero, Bounded, Num, Signed, Zero};
+use num::{Bounded, Num, Signed, Zero, one, zero};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ord)]
 pub struct Location<T: Num> {
@@ -57,8 +57,8 @@ impl<T: Num + Copy + Signed> Location<T> {
 }
 
 impl<T: Num + Copy + PartialOrd> Location<T> {
-    pub fn neighbours(&self) -> Vec<Self> {
-        vec![
+    pub fn neighbours(&self) -> impl IntoIterator<Item = Location<T>> {
+        [
             *self + Location::new(zero(), one()),
             *self + Location::new(one(), one()),
             *self + Location::new(one(), zero()),
@@ -238,7 +238,9 @@ impl<T: Num + PartialOrd> PartialOrd for Location<T> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         if (self.x < other.x) && (self.y <= other.y) || (self.x <= other.x) && (self.y < other.y) {
             Some(Ordering::Less)
-        } else if (self.x > other.x) && (self.y >= other.y) || (self.x >= other.x) && (self.y > other.y) {
+        } else if (self.x > other.x) && (self.y >= other.y)
+            || (self.x >= other.x) && (self.y > other.y)
+        {
             Some(Ordering::Greater)
         } else if self.x == other.x && self.y == other.y {
             Some(Ordering::Equal)
