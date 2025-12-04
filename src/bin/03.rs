@@ -1,14 +1,16 @@
 use advent_of_code::utils::parse_input_by_lines;
 use nom::IResult;
 use nom::Parser;
-use nom::character::complete::one_of;
-use nom::multi::many1;
+use nom::bytes::complete::take_while;
 use std::cmp::min;
 
 advent_of_code::solution!(3);
 
 pub fn parse_line(input: &str) -> IResult<&str, Vec<u64>> {
-    many1(one_of("0123456789").map(|c| c as u64 - '0' as u64)).parse(input)
+    let (input, line) = take_while(|c: char| c.is_numeric()).parse(input)?;
+    let result = line.chars().map(|c| c as u64 - '0' as u64).collect();
+
+    Ok((input, result))
 }
 
 pub fn parse(input: &str) -> IResult<&str, Vec<Vec<u64>>> {
