@@ -1,0 +1,28 @@
+{
+  "data": [
+    {
+      "total_nanos": 208400,
+      "part_2": "107.1µs",
+      "day": "01",
+      "part_1": "101.3µs"
+    },
+    {
+      "part_1": "6.1µs",
+      "day": "02",
+      "total_nanos": 33300,
+      "part_2": "27.2µs"
+    },
+    {
+      "part_2": "209.0µs",
+      "total_nanos": 281000,
+      "part_1": "72.0µs",
+      "day": "03"
+    },
+    {
+      "part_2": null,
+      "day": "04",
+      "total_nanos": 0,
+      "part_1": null
+    }
+  ]
+}
