@@ -29,8 +29,35 @@ pub fn part_one(input: &str) -> Option<usize> {
     Some(result)
 }
 
-pub fn part_two(input: &str) -> Option<u64> {
-    None
+pub fn part_two(input: &str) -> Option<usize> {
+    let (_, mut map) = parse(input).unwrap();
+
+    let mut queue = map
+        .iter_2d_keys()
+        .filter(|loc| map.get_2d(*loc) == Some(&'@'))
+        .collect::<Vec<_>>();
+
+    let mut result = 0usize;
+
+    while let Some(loc) = queue.pop() {
+        if map.get_2d(loc) != Some(&'@') {
+            continue;
+        }
+
+        let neighbours = loc
+            .neighbours()
+            .into_iter()
+            .filter(|neigh| map.get_2d(*neigh) == Some(&'@'))
+            .collect::<Vec<_>>();
+
+        if neighbours.len() < 4 {
+            result += 1;
+            queue.extend(neighbours);
+            map.set_2d(loc, '.');
+        }
+    }
+
+    Some(result)
 }
 
 #[cfg(test)]
@@ -46,6 +73,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(43));
     }
 }
