@@ -1,28 +1,28 @@
 {
   "data": [
     {
-      "total_nanos": 208400,
       "part_1": "101.3µs",
-      "day": "01",
-      "part_2": "107.1µs"
+      "total_nanos": 208400,
+      "part_2": "107.1µs",
+      "day": "01"
     },
     {
-      "total_nanos": 33300,
       "day": "02",
-      "part_1": "6.1µs",
-      "part_2": "27.2µs"
+      "total_nanos": 33300,
+      "part_2": "27.2µs",
+      "part_1": "6.1µs"
     },
     {
       "day": "03",
+      "part_1": "72.0µs",
       "total_nanos": 281000,
-      "part_2": "209.0µs",
-      "part_1": "72.0µs"
+      "part_2": "209.0µs"
     },
     {
-      "part_2": "1.7ms",
-      "total_nanos": 1928000,
+      "part_2": "915.2µs",
       "day": "04",
-      "part_1": "228.0µs"
+      "total_nanos": 1135100,
+      "part_1": "219.9µs"
     }
   ]
 }

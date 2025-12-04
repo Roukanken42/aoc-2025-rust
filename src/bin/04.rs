@@ -30,30 +30,51 @@ pub fn part_one(input: &str) -> Option<usize> {
 }
 
 pub fn part_two(input: &str) -> Option<usize> {
-    let (_, mut map) = parse(input).unwrap();
+    let (_, map) = parse(input).unwrap();
 
-    let mut queue = map
-        .iter_2d_keys()
-        .filter(|loc| map.get_2d(*loc) == Some(&'@'))
-        .collect::<Vec<_>>();
-
+    let mut queue = vec![];
     let mut result = 0usize;
+    let mut neighborhoods = vec![vec![None::<i32>; map[0].len()]; map.len()];
+
+    for loc in map.iter_2d_keys() {
+        if map.get_2d(loc) != Some(&'@') {
+            continue;
+        }
+
+        let count = loc
+            .neighbours()
+            .into_iter()
+            .filter(|neigh| map.get_2d(*neigh) == Some(&'@'))
+            .count();
+
+        neighborhoods.set_2d(loc, Some(count as i32));
+        if count < 4 {
+            queue.push(loc)
+        }
+    }
 
     while let Some(loc) = queue.pop() {
-        if map.get_2d(loc) != Some(&'@') {
+        if neighborhoods.get_2d(loc).unwrap_or(&None).unwrap_or(999) >= 4 {
             continue;
         }
 
         let neighbours = loc
             .neighbours()
             .into_iter()
-            .filter(|neigh| map.get_2d(*neigh) == Some(&'@'))
+            .filter(|neigh| neighborhoods.get_2d(*neigh).unwrap_or(&None) != &None)
             .collect::<Vec<_>>();
 
         if neighbours.len() < 4 {
             result += 1;
-            queue.extend(neighbours);
-            map.set_2d(loc, '.');
+            neighborhoods.set_2d(loc, None);
+
+            for neigh in neighbours {
+                let count = neighborhoods.get_2d(neigh).unwrap_or(&None).unwrap_or(999) - 1;
+                neighborhoods.set_2d(neigh, Some(count));
+                if count < 4 {
+                    queue.push(neigh)
+                }
+            }
         }
     }
 
