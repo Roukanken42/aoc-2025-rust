@@ -1,9 +1,11 @@
 use advent_of_code::utils::{Parsable, parse_input};
+use itertools::Itertools;
 use nom::IResult;
 use nom::Parser;
 use nom::character::complete::{char, line_ending, newline};
 use nom::multi::separated_list1;
 use nom::sequence::separated_pair;
+use std::cmp::Ordering;
 
 advent_of_code::solution!(5);
 
@@ -48,8 +50,49 @@ pub fn part_one(input: &str) -> Option<usize> {
     Some(result)
 }
 
+#[derive(Debug, PartialEq, Eq, Ord)]
+enum Broom {
+    Start(u64),
+    End(u64),
+}
+
+impl Broom {
+    fn value(&self) -> u64 {
+        match self {
+            Self::Start(v) => *v,
+            Self::End(v) => *v,
+        }
+    }
+}
+
+impl PartialOrd for Broom {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        self.value().partial_cmp(&other.value())
+    }
+}
+
 pub fn part_two(input: &str) -> Option<u64> {
-    None
+    let (_, input) = parse(input).unwrap();
+
+    let result = input
+        .intervals
+        .iter()
+        .flat_map(|&(start, end)| [Broom::Start(start), Broom::End(end + 1)])
+        .sorted()
+        .scan((0, 0), |(last, count), broom| {
+            let size = if *count > 0 { broom.value() - *last } else { 0 };
+
+            *last = broom.value();
+            *count += match broom {
+                Broom::Start(_) => 1,
+                Broom::End(_) => -1,
+            };
+
+            Some(size)
+        })
+        .sum();
+
+    Some(result)
 }
 
 #[cfg(test)]
@@ -77,6 +120,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(14));
     }
 }
