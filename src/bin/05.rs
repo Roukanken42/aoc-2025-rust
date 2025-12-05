@@ -38,7 +38,7 @@ fn parse(input: &str) -> IResult<&str, Input> {
     parse_input(Input::parse).parse(input)
 }
 
-pub fn part_one(input: &str) -> Option<usize> {
+pub fn part_one_brute(input: &str) -> Option<usize> {
     let (_, input) = parse(input).unwrap();
 
     let result = input
@@ -50,7 +50,7 @@ pub fn part_one(input: &str) -> Option<usize> {
     Some(result)
 }
 
-#[derive(Debug, PartialEq, Eq, Ord)]
+#[derive(Debug, PartialEq, Eq, Ord, Clone, Copy)]
 enum Broom {
     Start(u64),
     End(u64),
@@ -67,7 +67,11 @@ impl Broom {
 
 impl PartialOrd for Broom {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        self.value().partial_cmp(&other.value())
+        match (self, other) {
+            (Self::Start(s), Self::End(o)) if *s == *o => Some(Ordering::Less),
+            (Self::End(s), Self::Start(o)) if *s == *o => Some(Ordering::Greater),
+            _ => self.value().partial_cmp(&other.value()),
+        }
     }
 }
 
@@ -95,6 +99,65 @@ pub fn part_two(input: &str) -> Option<u64> {
     Some(result)
 }
 
+pub fn part_one(input: &str) -> Option<usize> {
+    let (_, input) = parse(input).unwrap();
+
+    let events = input
+        .intervals
+        .iter()
+        .flat_map(|&(start, end)| [Broom::Start(start), Broom::End(end + 1)])
+        .sorted()
+        .scan(0, |count, broom| {
+            let last_count = *count;
+
+            *count += match broom {
+                Broom::Start(_) => 1,
+                Broom::End(_) => -1,
+            };
+
+            Some(match (last_count, *count) {
+                (0, _) => Some(Broom::Start(broom.value())),
+                (_, 0) => Some(Broom::End(broom.value())),
+                _ => None,
+            })
+        })
+        .flatten()
+        .collect::<Vec<_>>();
+
+    fn bin_search(events: &[Broom], target: u64) -> Option<Broom> {
+        if events.is_empty() {
+            return None;
+        }
+        if events.len() == 1 && events[0].value() <= target {
+            return Some(events[0]);
+        };
+
+        let mid = events.len() / 2;
+        let (left, right) = events.split_at(mid);
+
+        if events[mid].value() <= target {
+            bin_search(right, target)
+        } else {
+            bin_search(left, target)
+        }
+    }
+
+    let result = input
+        .ingredients
+        .iter()
+        .map(|&i| bin_search(&events, i))
+        .filter(|broom| {
+            if let Some(Broom::Start(_)) = broom {
+                true
+            } else {
+                false
+            }
+        })
+        .count();
+
+    Some(result)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -114,6 +177,12 @@ mod tests {
     #[test]
     fn test_part_one() {
         let result = part_one(&advent_of_code::template::read_file("examples", DAY));
+        assert_eq!(result, Some(3));
+    }
+
+    #[test]
+    fn test_part_one_brute() {
+        let result = part_one_brute(&advent_of_code::template::read_file("examples", DAY));
         assert_eq!(result, Some(3));
     }
 
