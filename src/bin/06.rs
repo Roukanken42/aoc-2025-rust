@@ -1,6 +1,5 @@
 use advent_of_code::utils::dynamic_zip::DynamicZipable;
 use advent_of_code::utils::{Parsable, parse_input, parse_input_by_lines};
-use itertools::Itertools;
 use nom::branch::alt;
 use nom::bytes::complete::take_while1;
 use nom::character::char;
