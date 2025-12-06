@@ -24,6 +24,7 @@ impl Parsable<'_> for Input {
     fn parse(input: &str) -> IResult<&str, Self> {
         let parse_number_row = separated_list1(space1, u64::parse);
 
+        let (input, _) = space0.parse(input)?;
         let (input, data) =
             separated_list1((space0, line_ending, space0), parse_number_row).parse(input)?;
         let (input, _) = (space0, line_ending, space0).parse(input)?;
@@ -47,7 +48,21 @@ fn parse(input: &str) -> IResult<&str, Input> {
 }
 
 pub fn part_one(input: &str) -> Option<u64> {
-    None
+    let (_, input) = parse(input).unwrap();
+
+    let result = input
+        .operations
+        .iter()
+        .enumerate()
+        .scan(0, |_, (index, operation)| {
+            Some(match operation {
+                Operation::Add => input.data.iter().fold(0, |acc, row| acc + row[index]),
+                Operation::Multiply => input.data.iter().fold(1, |acc, row| acc * row[index]),
+            })
+        })
+        .sum();
+
+    Some(result)
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
@@ -83,7 +98,7 @@ mod tests {
     #[test]
     fn test_part_one() {
         let result = part_one(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(4277556));
     }
 
     #[test]
