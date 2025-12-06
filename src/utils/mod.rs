@@ -1,3 +1,4 @@
+pub mod dynamic_zip;
 pub mod location;
 
 use std::str::FromStr;
