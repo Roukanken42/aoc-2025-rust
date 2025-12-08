@@ -3,6 +3,7 @@ use std::fmt::{Display, Formatter};
 use std::iter::{Sum, successors};
 use std::ops::{Add, Div, Mul, Neg, RangeInclusive, Rem, Sub};
 
+use num::integer::Roots;
 use num::traits::Euclid;
 use num::{Bounded, Num, Signed, Zero, one, zero};
 
@@ -204,6 +205,25 @@ impl<T: Num + Copy + Signed> Neg for Location<T> {
 impl<T: Num + Copy> Sum for Location<T> {
     fn sum<I: Iterator<Item = Self>>(iter: I) -> Self {
         iter.fold(Location::zero(), Add::add)
+    }
+}
+
+impl<T: Num + Copy> From<(T, T)> for Location<T> {
+    fn from((x, y): (T, T)) -> Self {
+        Self::new(x, y)
+    }
+}
+
+pub trait Distance<U: Num> {
+    fn distance(self: &Self, other: &Self) -> U;
+}
+
+impl<T: Num + Copy + Into<U>, U: Num + Copy + Roots> Distance<U> for Location<T> {
+    fn distance(self: &Self, other: &Self) -> U {
+        let diff_x = (self.x - other.x).into();
+        let diff_y = (self.y - other.y).into();
+
+        (diff_x * diff_x + diff_y * diff_y).sqrt()
     }
 }
 
