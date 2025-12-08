@@ -1,6 +1,7 @@
 pub mod dynamic_zip;
 pub mod location;
 pub mod location3d;
+pub mod union_find;
 
 use std::str::FromStr;
 

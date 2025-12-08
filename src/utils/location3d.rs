@@ -2,10 +2,11 @@ use crate::utils::Parsable;
 use crate::utils::location::Distance;
 use nom::Parser;
 use nom::error::Error;
-use num::integer::Roots;
+use num::pow::Pow;
 use num::traits::Euclid;
 use num::{Bounded, Num, Signed, Zero, one, zero};
 use std::fmt::{Display, Formatter};
+use std::hash::Hash;
 use std::iter::{Sum, successors};
 use std::ops::{Add, Div, Mul, Neg, RangeInclusive, Rem, Sub};
 
@@ -170,13 +171,13 @@ impl<T: Num + Copy> Sum for Location3<T> {
     }
 }
 
-impl<T: Num + Copy + Into<U>, U: Num + Copy + Roots> Distance<U> for Location3<T> {
-    fn distance(self: &Self, other: &Self) -> U {
-        let diff_x = (self.x - other.x).into();
-        let diff_y = (self.y - other.y).into();
-        let diff_z = (self.z - other.z).into();
+impl<T: Num + Copy> Distance<T> for Location3<T> {
+    fn distance<U: Num + Copy + Pow<f32, Output = U> + From<T>>(self: &Self, other: &Self) -> U {
+        let diff_x: U = U::from(self.x) - U::from(other.x);
+        let diff_y: U = U::from(self.y) - U::from(other.y);
+        let diff_z: U = U::from(self.z) - U::from(other.z);
 
-        (diff_x * diff_x + diff_y * diff_y + diff_z * diff_z).sqrt()
+        (diff_x * diff_x + diff_y * diff_y + diff_z * diff_z).pow(0.5)
     }
 }
 

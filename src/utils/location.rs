@@ -2,8 +2,7 @@ use crate::utils::Parsable;
 use nom::Parser;
 use nom::error::Error;
 use nom::sequence::separated_pair;
-use num::integer::Roots;
-use num::traits::Euclid;
+use num::traits::{Euclid, Pow};
 use num::{Bounded, Num, Signed, Zero, one, zero};
 use std::cmp::Ordering;
 use std::fmt::{Display, Formatter};
@@ -225,16 +224,16 @@ impl<T: Num + Copy> From<(T, T)> for Location<T> {
     }
 }
 
-pub trait Distance<U: Num> {
-    fn distance(self: &Self, other: &Self) -> U;
+pub trait Distance<T: Num + Copy> {
+    fn distance<U: Num + Copy + Pow<f32, Output = U> + From<T>>(self: &Self, other: &Self) -> U;
 }
 
-impl<T: Num + Copy + Into<U>, U: Num + Copy + Roots> Distance<U> for Location<T> {
-    fn distance(self: &Self, other: &Self) -> U {
-        let diff_x = (self.x - other.x).into();
-        let diff_y = (self.y - other.y).into();
+impl<T: Num + Copy> Distance<T> for Location<T> {
+    fn distance<U: Num + Copy + Pow<f32, Output = U> + From<T>>(self: &Self, other: &Self) -> U {
+        let diff_x: U = U::from(self.x) - U::from(other.x);
+        let diff_y: U = U::from(self.y) - U::from(other.y);
 
-        (diff_x * diff_x + diff_y * diff_y).sqrt()
+        (diff_x * diff_x + diff_y * diff_y).pow(0.5)
     }
 }
 
