@@ -1,40 +1,40 @@
 {
   "data": [
     {
-      "part_2": "107.1µs",
-      "total_nanos": 208400,
+      "day": "01",
       "part_1": "101.3µs",
-      "day": "01"
+      "part_2": "107.1µs",
+      "total_nanos": 208400
     },
     {
-      "day": "02",
-      "part_2": "27.2µs",
       "total_nanos": 33300,
-      "part_1": "6.1µs"
+      "part_2": "27.2µs",
+      "part_1": "6.1µs",
+      "day": "02"
     },
     {
       "part_2": "209.0µs",
+      "day": "03",
       "total_nanos": 281000,
-      "part_1": "72.0µs",
-      "day": "03"
+      "part_1": "72.0µs"
     },
     {
+      "total_nanos": 1135100,
       "part_1": "219.9µs",
       "day": "04",
-      "total_nanos": 1135100,
       "part_2": "915.2µs"
     },
     {
-      "total_nanos": 188600,
-      "part_2": "40.3µs",
-      "part_1": "148.3µs",
-      "day": "05"
+      "total_nanos": 112200,
+      "day": "05",
+      "part_2": "42.1µs",
+      "part_1": "70.1µs"
     },
     {
       "total_nanos": 566800,
-      "day": "06",
+      "part_1": "93.5µs",
       "part_2": "473.3µs",
-      "part_1": "93.5µs"
+      "day": "06"
     }
   ]
 }
