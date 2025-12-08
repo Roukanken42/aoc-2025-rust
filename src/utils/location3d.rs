@@ -1,11 +1,13 @@
-use std::fmt::{Display, Formatter};
-use std::iter::{Sum, successors};
-use std::ops::{Add, Div, Mul, Neg, RangeInclusive, Rem, Sub};
-
+use crate::utils::Parsable;
 use crate::utils::location::Distance;
+use nom::Parser;
+use nom::error::Error;
 use num::integer::Roots;
 use num::traits::Euclid;
 use num::{Bounded, Num, Signed, Zero, one, zero};
+use std::fmt::{Display, Formatter};
+use std::iter::{Sum, successors};
+use std::ops::{Add, Div, Mul, Neg, RangeInclusive, Rem, Sub};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Location3<T: Num> {
@@ -31,6 +33,24 @@ impl<T: Num> Location3<T> {
 
     pub fn try_map<U: Num, E, F: Fn(T) -> Result<U, E>>(self, f: F) -> Result<Location3<U>, E> {
         Ok(Location3::new(f(self.x)?, f(self.y)?, f(self.z)?))
+    }
+}
+
+pub fn location3<'a, T, Sep>(
+    mut sep: Sep,
+) -> impl Parser<&'a str, Output = Location3<T>, Error = Error<&'a str>>
+where
+    T: Num + Parsable<'a>,
+    Sep: Parser<&'a str, Error = Error<&'a str>>,
+{
+    move |i: &'a str| {
+        let (i, x) = T::parse(i)?;
+        let (i, _) = sep.parse(i)?;
+        let (i, y) = T::parse(i)?;
+        let (i, _) = sep.parse(i)?;
+        let (i, z) = T::parse(i)?;
+
+        Ok((i, Location3::new(x, y, z)))
     }
 }
 

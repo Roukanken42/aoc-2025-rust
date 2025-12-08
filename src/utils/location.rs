@@ -1,11 +1,14 @@
+use crate::utils::Parsable;
+use nom::Parser;
+use nom::error::Error;
+use nom::sequence::separated_pair;
+use num::integer::Roots;
+use num::traits::Euclid;
+use num::{Bounded, Num, Signed, Zero, one, zero};
 use std::cmp::Ordering;
 use std::fmt::{Display, Formatter};
 use std::iter::{Sum, successors};
 use std::ops::{Add, Div, Mul, Neg, RangeInclusive, Rem, Sub};
-
-use num::integer::Roots;
-use num::traits::Euclid;
-use num::{Bounded, Num, Signed, Zero, one, zero};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ord)]
 pub struct Location<T: Num> {
@@ -31,6 +34,14 @@ impl<T: Num> Location<T> {
     pub fn try_map<U: Num, E, F: Fn(T) -> Result<U, E>>(self, f: F) -> Result<Location<U>, E> {
         Ok(Location::new(f(self.x)?, f(self.y)?))
     }
+}
+
+pub fn location<'a, T, Sep, E>(sep: Sep) -> impl Parser<&'a str, Output = Location<T>>
+where
+    T: Num + Parsable<'a>,
+    Sep: Parser<&'a str, Error = Error<&'a str>>,
+{
+    separated_pair(T::parse, sep, T::parse).map(|(x, y)| Location::new(x, y))
 }
 
 impl<T: Num + Copy + Signed> Location<T> {
