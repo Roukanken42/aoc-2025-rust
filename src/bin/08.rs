@@ -45,7 +45,30 @@ pub fn part_one(input: &str) -> Option<usize> {
     part_one_connections(input, 1000)
 }
 
-pub fn part_two(input: &str) -> Option<u64> {
+pub fn part_two(input: &str) -> Option<u32> {
+    let (_, locations) = parse(input).unwrap();
+
+    let mut cluster_data: UnionFind<_> = locations.iter().cloned().collect();
+    let edges = locations
+        .iter()
+        .tuple_combinations()
+        .map(|(x, y)| (x.distance::<f64>(y), (x, y)))
+        .sorted_by(|(a, _), (b, _)| a.partial_cmp(b).unwrap_or(Ordering::Equal));
+
+    let mut circuits = locations.len();
+
+    for (_, (left, right)) in edges {
+        if let Some((x, y)) = cluster_data.union(left, right) {
+            if x != y {
+                circuits -= 1;
+            }
+
+            if circuits == 1 {
+                return Some(left.x * right.x);
+            }
+        }
+    }
+
     None
 }
 
@@ -98,6 +121,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(25272));
     }
 }
