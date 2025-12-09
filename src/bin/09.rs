@@ -1,17 +1,31 @@
 use advent_of_code::utils::location::{Location, location};
 use advent_of_code::utils::parse_input_by_lines;
+use itertools::Itertools;
 use nom::IResult;
 use nom::Parser;
 use nom::character::complete::char;
 
 advent_of_code::solution!(9);
 
-fn parse(input: &str) -> IResult<&str, Vec<Location<u64>>> {
+fn parse(input: &str) -> IResult<&str, Vec<Location<i64>>> {
     parse_input_by_lines(location(char(','))).parse(input)
 }
 
-pub fn part_one(input: &str) -> Option<u64> {
-    None
+fn area(a: &Location<i64>, b: &Location<i64>) -> i64 {
+    let diff_x = a.x - b.x;
+    let diff_y = a.y - b.y;
+
+    (diff_x + 1) * (diff_y + 1)
+}
+
+pub fn part_one(input: &str) -> Option<i64> {
+    let (_, locations) = parse(input).unwrap();
+
+    locations
+        .iter()
+        .tuple_combinations()
+        .max_by_key(|(a, b)| area(a, b))
+        .map(|(a, b)| area(a, b))
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
@@ -48,7 +62,7 @@ mod tests {
     #[test]
     fn test_part_one() {
         let result = part_one(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(50));
     }
 
     #[test]
