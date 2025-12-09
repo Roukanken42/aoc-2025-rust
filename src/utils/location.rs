@@ -35,7 +35,9 @@ impl<T: Num> Location<T> {
     }
 }
 
-pub fn location<'a, T, Sep, E>(sep: Sep) -> impl Parser<&'a str, Output = Location<T>>
+pub fn location<'a, T, Sep>(
+    sep: Sep,
+) -> impl Parser<&'a str, Output = Location<T>, Error = Error<&'a str>>
 where
     T: Num + Parsable<'a>,
     Sep: Parser<&'a str, Error = Error<&'a str>>,
